@@ -9,6 +9,7 @@ import requests
 import random
 from PIL import Image
 from tqdm import tqdm
+from typing import Tuple, Dict, List
 
 # Make function to find classes in target directory
 def find_classes(directory: str) -> Tuple[List[str], Dict[str, int]]:
