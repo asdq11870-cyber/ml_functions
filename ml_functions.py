@@ -11,6 +11,33 @@ from PIL import Image
 from tqdm import tqdm
 from typing import Tuple, Dict, List
 
+def display_random_images(dataset: torch.utils.data.Dataset,
+                          classes: List[str],
+                          n: int = 10,
+                          display_shape: bool = True,
+                          seed: int = None):
+    
+  if n > 10:
+    n = 10
+    display_shape = False
+
+  if seed:
+    random.seed(seed)
+
+  random_index = random.sample(range(len(dataset)), k=n)
+  plt.figure(figsize=(16,8))
+  for i, random_idx in enumerate(random_index):
+    targ_image, targ_label = dataset[random_idx][0], dataset[random_idx][1]
+    targ_image_adjust = targ_image.permute(1,2,0)
+    plt.subplot(1,n,i+1)
+    plt.imshow(targ_image_adjust)
+    plt.axis(False)
+    if classes:
+      title = f"class: {classes[targ_label]}"
+      if display_shape:
+        title = title + f" | shape: {targ_image_adjust.shape}"
+    plt.title(title)
+
 # Make function to find classes in target directory
 def find_classes(directory: str) -> Tuple[List[str], Dict[str, int]]:
     """Finds the class folder names in a target directory.
