@@ -134,6 +134,13 @@ def importing_torchmetrics():
 
     print(torchmetrics.__version__)
 
+def importing_torchinfo():
+    try:
+        import torchinfo
+    except ImportError:
+        import subprocess, sys
+        subprocess.check_call([sys.executable,"-m", "pip", "install", "torchinfo"])
+    print(torchinfo.__version__)
 
 def training_loop(model, loss_fn, optimiser, x_train, y_train, x_test, y_test, epochs, device):
   epoch_count = []
