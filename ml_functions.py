@@ -16,7 +16,6 @@ def display_random_images(dataset: torch.utils.data.Dataset,
                           n: int = 10,
                           display_shape: bool = True,
                           seed: int = None):
-    
   if n > 10:
     n = 10
     display_shape = False
@@ -32,6 +31,7 @@ def display_random_images(dataset: torch.utils.data.Dataset,
     plt.subplot(1,n,i+1)
     plt.imshow(targ_image_adjust)
     plt.axis(False)
+    title = ""
     if classes:
       title = f"class: {classes[targ_label]}"
       if display_shape:
