@@ -193,27 +193,30 @@ def loading_model(model_class,model_save_path, device,*args,**kwargs):
   loaded_model.eval()
   return loaded_model
 
-def batch_training_loop(model: nn.Module, data_loader, loss_fn, optimiser, epochs):
+def batch_training_loop(model: nn.Module, data_loader, loss_fn, optimiser, epochs, device: torch.device):
 
     for epoch in range(epochs):
         print(f"Epoch: {epoch} \n ---------------------------")
-        train_loss = 0
+        train_loss, train_acc = 0,0
         for batch, (x,y) in enumerate(data_loader):
+            x,y = x.to(device), y.to(device)
             model.train()
             y_preds0 = model(x)
             loss = loss_fn(y_preds0, y)
             train_loss += loss
+            train_acc += accuracy_fn(y_true=y,y_pred=y_preds0)
             optimiser.zero_grad()
             loss.backward()
             optimiser.step()
 
-            if batch % 400 == 0:
-                print(f"Looked at {batch*len(x)}/{len(data_loader.dataset)} samples")
+            #if batch % 400 == 0:
+                #print(f"Looked at {batch*len(x)}/{len(data_loader.dataset)} samples")
 
         train_loss /= len(data_loader)
-        batch_testing_loop(model,loss_fn,data_loader,train_loss)
+        train_acc /= len(data_loader)
+        batch_testing_loop(model,loss_fn,data_loader,train_loss,train_acc)
 
-def batch_testing_loop(model:nn.Module,loss_fn,data_loader,train_loss):
+def batch_testing_loop(model:nn.Module,loss_fn,data_loader,train_loss,train_acc):
     test_loss, test_acc = 0,0
     model.eval()
     with torch.inference_mode():
@@ -225,7 +228,7 @@ def batch_testing_loop(model:nn.Module,loss_fn,data_loader,train_loss):
         test_loss /= len(data_loader)
         test_acc /= len(data_loader)
 
-    print(f"\nTrain loss: {train_loss:.5f} | Test loss: {test_loss:.5f}, Test acc: {test_acc:.2f}%\n")
+    print(f"\nTrain loss: {train_loss:.5f} | Train acc: {train_acc:.5f} | Test loss: {test_loss:.5f} | Test acc: {test_acc:.2f}%\n")
 
 """
 A series of helper functions used throughout the course.
