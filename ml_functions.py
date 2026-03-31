@@ -195,7 +195,7 @@ def loading_model(model_class,model_save_path, device,*args,**kwargs):
   return loaded_model
 
 def batch_training_loop(model: nn.Module,
-                        train_data_loader: torch.util.data.DataLoader,
+                        train_data_loader: torch.utils.data.DataLoader,
                         test_data_loader: torch.utils.data.DataLoader,
                         loss_fn,
                         optimiser,
