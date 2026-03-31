@@ -197,7 +197,7 @@ def loading_model(model_class,model_save_path, device,*args,**kwargs):
 def batch_training_loop(model: nn.Module, data_loader, loss_fn, optimiser, epochs, device: torch.device):
 
     for epoch in range(epochs):
-        print(f"Epoch: {epoch} \n ---------------------------")
+        print(f"Epoch: {epoch} \n ---------------------------------------------------------")
         train_loss, train_acc = 0,0
         for batch, (x,y) in enumerate(data_loader):
             x,y = x.to(device), y.to(device)
@@ -215,9 +215,9 @@ def batch_training_loop(model: nn.Module, data_loader, loss_fn, optimiser, epoch
 
         train_loss /= len(data_loader)
         train_acc /= len(data_loader)
-        batch_testing_loop(model,loss_fn,data_loader,train_loss,train_acc)
+        batch_testing_loop(model,loss_fn,data_loader,train_loss,train_acc,epoch)
 
-def batch_testing_loop(model:nn.Module,loss_fn,data_loader,train_loss,train_acc):
+def batch_testing_loop(model:nn.Module,loss_fn,data_loader,train_loss,train_acc,epoch):
     test_loss, test_acc = 0,0
     model.eval()
     with torch.inference_mode():
@@ -229,7 +229,8 @@ def batch_testing_loop(model:nn.Module,loss_fn,data_loader,train_loss,train_acc)
         test_loss /= len(data_loader)
         test_acc /= len(data_loader)
 
-    print(f"\nTrain loss: {train_loss:.5f} | Train acc: {train_acc:.5f} | Test loss: {test_loss:.5f} | Test acc: {test_acc:.2f}%\n")
+    if epoch % 100 == 0:
+        print(f"\nTrain loss: {train_loss:.5f} | Train acc: {train_acc:.5f} | Test loss: {test_loss:.5f} | Test acc: {test_acc:.2f}%\n")
 
 """
 A series of helper functions used throughout the course.
