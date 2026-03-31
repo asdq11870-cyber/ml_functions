@@ -19,6 +19,7 @@ def display_random_images(dataset: torch.utils.data.Dataset,
   if n > 10:
     n = 10
     display_shape = False
+    print("Only 10 images for viewing purposes!")
 
   if seed:
     random.seed(seed)
