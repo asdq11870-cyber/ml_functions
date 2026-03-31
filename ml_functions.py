@@ -223,7 +223,13 @@ def batch_training_loop(model: nn.Module,
         train_acc /= len(train_data_loader)
         batch_testing_loop(model,loss_fn,test_data_loader,train_loss,train_acc,epoch)
 
-def batch_testing_loop(model:nn.Module,loss_fn,data_loader,train_loss,train_acc,epoch):
+def batch_testing_loop(model:nn.Module,
+                       loss_fn,
+                       data_loader,
+                       train_loss,
+                       train_acc,
+                       epoch):
+    
     test_loss, test_acc = 0,0
     model.eval()
     with torch.inference_mode():
