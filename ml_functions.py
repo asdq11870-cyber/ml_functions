@@ -326,19 +326,16 @@ def plot_predictions(
 
 # Calculate accuracy (a classification metric)
 def accuracy_fn(y_true, y_pred):
-    """Calculates accuracy between truth labels and predictions.
+    
+    if y_pred.ndim == 1:
+        y_pred_classes = y_pred.argmax().unsqueeze(0)
+        y_true = y_true.unsqueeze(0)
+    else:
+        y_pred_classes = y_pred.argmax(dim=1)
 
-    Args:
-        y_true (torch.Tensor): Truth labels for predictions.
-        y_pred (torch.Tensor): Predictions to be compared to predictions.
-
-    Returns:
-        [torch.float]: Accuracy value between y_true and y_pred, e.g. 78.45
-    """
-    correct = torch.eq(y_true, y_pred).sum().item()
-    acc = (correct / len(y_pred)) * 100
+    correct = torch.eq(y_true, y_pred_classes).sum().item()
+    acc = (correct / len(y_pred_classes)) * 100
     return acc
-
 
 def print_train_time(start, end, device=None):
     """Prints difference between start and end time.
