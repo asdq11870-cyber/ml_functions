@@ -200,7 +200,8 @@ def batch_training_loop(model: nn.Module,
                         loss_fn,
                         optimiser,
                         epochs: int,
-                        device: torch.device):
+                        device: torch.device,
+                        divisor: int):
 
     for epoch in range(epochs):
         print(f"Epoch: {epoch} \n ---------------------------------------------------------")
@@ -221,19 +222,22 @@ def batch_training_loop(model: nn.Module,
 
         train_loss /= len(train_data_loader)
         train_acc /= len(train_data_loader)
-        batch_testing_loop(model,loss_fn,test_data_loader,train_loss,train_acc,epoch)
+        batch_testing_loop(model,loss_fn,test_data_loader,train_loss,train_acc,epoch,divisor)
 
 def batch_testing_loop(model:nn.Module,
                        loss_fn,
                        data_loader,
                        train_loss,
                        train_acc,
-                       epoch):
+                       epoch,
+                       device: torch.device,
+                       divisor: int):
     
     test_loss, test_acc = 0,0
     model.eval()
     with torch.inference_mode():
         for x,y in data_loader:
+            x,y = x.to(device), y.to(device)
             test_preds = model(x)
             test_loss += loss_fn(test_preds, y)
             test_acc += accuracy_fn(y_true=y, y_pred=test_preds.argmax(dim=1))
@@ -241,7 +245,7 @@ def batch_testing_loop(model:nn.Module,
         test_loss /= len(data_loader)
         test_acc /= len(data_loader)
 
-    if epoch % 100 == 0:
+    if epoch % divisor == 0:
         print(f"\nTrain loss: {train_loss:.5f} | Train acc: {train_acc:.5f} | Test loss: {test_loss:.5f} | Test acc: {test_acc:.2f}%\n")
 
 """
