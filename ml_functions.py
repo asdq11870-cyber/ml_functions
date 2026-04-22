@@ -205,14 +205,14 @@ def batch_training_loop(model: nn.Module,
 
     for epoch in range(epochs):
         print(f"Epoch: {epoch+1} \n ---------------------------------------------------------")
-        train_loss, train_acc = 0,0
+        train_loss, train_correct, train_total = 0.0, 0, 0
         for batch, (x,y) in enumerate(train_data_loader):
             x,y = x.to(device), y.to(device)
             model.train()
-            y_preds0 = model(x)
-            loss = loss_fn(y_preds0, y)
-            train_loss += loss
-            train_acc += accuracy_fn(y_true=y,y_pred=y_preds0)
+            y_preds = model(x)
+            train_loss += loss_fn(y_preds, y)
+            train_correct += accuracy_fn(y_true=y,y_pred=y_preds)
+            train_total = y.size(0)
             optimiser.zero_grad()
             loss.backward()
             optimiser.step()
@@ -221,7 +221,7 @@ def batch_training_loop(model: nn.Module,
                 #print(f"Looked at {batch*len(x)}/{len(data_loader.dataset)} samples")
 
         train_loss /= len(train_data_loader)
-        train_acc /= len(train_data_loader)
+        train_acc = 100 * (train_correct / train_total)
         batch_testing_loop(model,loss_fn,test_data_loader,train_loss,train_acc,epoch+1,device,divisor)
 
 def batch_testing_loop(model:nn.Module,
@@ -233,17 +233,18 @@ def batch_testing_loop(model:nn.Module,
                        device: torch.device,
                        divisor: int):
     
-    test_loss, test_acc = 0,0
+    test_loss, test_correct, test_total = 0.0,0,0
     model.eval()
     with torch.inference_mode():
         for x,y in data_loader:
             x,y = x.to(device), y.to(device)
             test_preds = model(x)
             test_loss += loss_fn(test_preds, y)
-            test_acc += accuracy_fn(y_true=y, y_pred=test_preds.argmax(dim=1))
+            test_correct += accuracy_fn(y_true=y,y_pred=test_preds)
+            test_total += y.size(0)
         
         test_loss /= len(data_loader)
-        test_acc /= len(data_loader)
+        test_acc = 100 * (test_correct / test_total)
 
     if epoch % divisor == 0:
         print(f"\nTrain loss: {train_loss:.5f} | Train acc: {train_acc:.2f}% | Test loss: {test_loss:.5f} | Test acc: {test_acc:.2f}%\n")
@@ -330,16 +331,9 @@ def plot_predictions(
 
 # Calculate accuracy (a classification metric)
 def accuracy_fn(y_true, y_pred):
-    
-    if y_pred.ndim == 1:
-        y_pred_classes = y_pred.argmax().unsqueeze(0)
-        y_true = y_true.unsqueeze(0)
-    else:
-        y_pred_classes = y_pred.argmax(dim=1)
-
-    correct = torch.eq(y_true, y_pred_classes).sum().item()
-    acc = (correct / len(y_pred_classes)) * 100
-    return acc
+    y_pred_classes = y_pred.argmax(dim=1)
+    correct = (y_pred_classes == y_true).sum().item()
+    return correct
 
 def print_train_time(start, end, device=None):
     """Prints difference between start and end time.
