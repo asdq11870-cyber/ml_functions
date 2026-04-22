@@ -246,7 +246,7 @@ def batch_testing_loop(model:nn.Module,
         test_acc /= len(data_loader)
 
     if epoch % divisor == 0:
-        print(f"\nTrain loss: {train_loss:.5f} | Train acc: {train_acc:.5f} | Test loss: {test_loss:.5f} | Test acc: {test_acc:.2f}%\n")
+        print(f"\nTrain loss: {train_loss:.5f} | Train acc: {train_acc:.2f}% | Test loss: {test_loss:.5f} | Test acc: {test_acc:.2f}%\n")
 
 """
 A series of helper functions used throughout the course.
