@@ -354,7 +354,6 @@ def print_train_time(start, end, device=None):
     """
     total_time = end - start
     print(f"\nTrain time on {device}: {total_time:.3f} seconds")
-    return total_time
 
 
 # Plot loss curves of a model
