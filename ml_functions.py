@@ -222,7 +222,7 @@ def batch_training_loop(model: nn.Module,
 
         train_loss /= len(train_data_loader)
         train_acc /= len(train_data_loader)
-        batch_testing_loop(model,loss_fn,test_data_loader,train_loss,train_acc,epoch,divisor)
+        batch_testing_loop(model,loss_fn,test_data_loader,train_loss,train_acc,epoch,device,divisor)
 
 def batch_testing_loop(model:nn.Module,
                        loss_fn,
