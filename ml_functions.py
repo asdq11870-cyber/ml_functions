@@ -204,7 +204,7 @@ def batch_training_loop(model: nn.Module,
                         divisor: int):
 
     for epoch in range(epochs):
-        print(f"Epoch: {epoch} \n ---------------------------------------------------------")
+        print(f"Epoch: {epoch+1} \n ---------------------------------------------------------")
         train_loss, train_acc = 0,0
         for batch, (x,y) in enumerate(train_data_loader):
             x,y = x.to(device), y.to(device)
@@ -222,7 +222,7 @@ def batch_training_loop(model: nn.Module,
 
         train_loss /= len(train_data_loader)
         train_acc /= len(train_data_loader)
-        batch_testing_loop(model,loss_fn,test_data_loader,train_loss,train_acc,epoch,device,divisor)
+        batch_testing_loop(model,loss_fn,test_data_loader,train_loss,train_acc,epoch+1,device,divisor)
 
 def batch_testing_loop(model:nn.Module,
                        loss_fn,
