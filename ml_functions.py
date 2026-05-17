@@ -209,11 +209,12 @@ def batch_training_loop(model: nn.Module,
         for batch, (x,y) in enumerate(train_data_loader):
             x,y = x.to(device), y.to(device)
             model.train()
-            y_preds = model(x)
-            loss = loss_fn(y_preds, y)
+            y_logits = model(x)
+            loss = loss_fn(y_logits, y)
             train_loss += loss.item()
-            train_correct += accuracy_fn(y_true=y,y_pred=y_preds)
-            train_total = y.size(0)
+            y_pred_labels = y_logits.argmax(dim=1)
+            train_correct += (y_pred_labels == y).sum().item()
+            train_total += y.size(0)
             optimiser.zero_grad()
             loss.backward()
             optimiser.step()
@@ -239,9 +240,10 @@ def batch_testing_loop(model:nn.Module,
     with torch.inference_mode():
         for x,y in data_loader:
             x,y = x.to(device), y.to(device)
-            test_preds = model(x)
-            test_loss += loss_fn(test_preds, y)
-            test_correct += accuracy_fn(y_true=y,y_pred=test_preds)
+            test_logits = model(x)
+            test_loss += loss_fn(test_logits, y).item()
+            test_pred_labels = test_logits.argmax(dim=1)
+            test_correct += (test_pred_labels == y).sum().item()
             test_total += y.size(0)
         
         test_loss /= len(data_loader)
