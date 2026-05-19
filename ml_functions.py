@@ -111,12 +111,11 @@ def batch_eval_model(model: torch.nn.Module,
                 x, y = x.to(device), y.to(device)
 
                 y_logits = model(x)
-                y_pred_labels = y_logits.argmax(dim=1)
 
-                loss += loss_fn(y_logits, y).item()
+                loss += loss_fn(y_logits, y).item() * y.size(0)
                 correct += accuracy_fn(
                     y_true=y,
-                    y_pred=y_pred_labels
+                    y_pred=y_logits
                 )
                 total += y.size(0)
 
