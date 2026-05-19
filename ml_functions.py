@@ -101,7 +101,9 @@ def batch_eval_model(model: torch.nn.Module,
                device: torch.device):
 
     def evaluate(data_loader):
-        loss, acc = 0, 0
+        loss = 0.0
+        correct = 0
+        total = 0
 
         model.eval()
         with torch.inference_mode():
@@ -120,8 +122,6 @@ def batch_eval_model(model: torch.nn.Module,
 
         loss /= total
         acc = 100 *(correct/total)
-
-            
 
         return loss, acc
 
