@@ -118,12 +118,12 @@ def batch_eval_model(model: torch.nn.Module,
                 )
                 total += y.size(0)
 
-      loss /= total
-      acc = 100 *(correct/total)
+        loss /= total
+        acc = 100 *(correct/total)
 
             
 
-      return loss, acc
+        return loss, acc
 
     train_loss, train_acc = evaluate(train_data_loader)
     test_loss, test_acc = evaluate(test_data_loader)
