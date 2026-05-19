@@ -116,7 +116,7 @@ def batch_eval_model(model: torch.nn.Module,
                     y_true=y,
                     y_pred=y_pred_labels
                 )
-              total += y.size(0)
+                total += y.size(0)
 
       loss /= total
       acc = 100 *(correct/total)
