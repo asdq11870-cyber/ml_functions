@@ -276,6 +276,8 @@ def batch_testing_loop(model:nn.Module,
                        epoch,
                        device: torch.device,
                        divisor: int):
+
+    
     
     test_loss, test_correct, test_total = 0.0,0,0
     model.eval()
@@ -293,6 +295,71 @@ def batch_testing_loop(model:nn.Module,
 
     if epoch % divisor == 0:
         print(f"\nTrain loss: {train_loss:.5f} | Train acc: {train_acc:.2f}% | Test loss: {test_loss:.5f} | Test acc: {test_acc:.2f}%\n")
+
+def batch_train(model: nn.Module,
+                        train_data_loader: torch.utils.data.DataLoader,
+                        test_data_loader: torch.utils.data.DataLoader,
+                        loss_fn,
+                        optimiser,
+                        epochs: int,
+                        device: torch.device,
+                        divisor: int,
+                        loss_curves: bool = False):
+    
+    results = {
+        "train_loss": [],
+        "train_acc": [],
+        "test_loss": [],
+        "test_acc": []
+    }
+
+    for epoch in range(epochs):
+        print(f"Epoch: {epoch+1} \n ---------------------------------------------------------")
+        train_loss, train_correct, train_total = 0.0, 0, 0
+        for batch, (x,y) in enumerate(train_data_loader):
+            x,y = x.to(device), y.to(device)
+            model.train()
+            y_logits = model(x)
+            loss = loss_fn(y_logits, y)
+            train_loss += loss.item()
+            y_pred_labels = y_logits.argmax(dim=1)
+            train_correct += (y_pred_labels == y).sum().item()
+            train_total += y.size(0)
+            optimiser.zero_grad()
+            loss.backward()
+            optimiser.step()
+
+            #if batch % 400 == 0:
+                #print(f"Looked at {batch*len(x)}/{len(data_loader.dataset)} samples")
+
+        train_loss /= len(train_data_loader)
+        train_acc = 100 * (train_correct / train_total)
+
+        test_loss, test_correct, test_total = 0.0,0,0
+        model.eval()
+        with torch.inference_mode():
+            for x,y in test_data_loader:
+                x,y = x.to(device), y.to(device)
+                test_logits = model(x)
+                test_loss += loss_fn(test_logits, y).item()
+                test_pred_labels = test_logits.argmax(dim=1)
+                test_correct += (test_pred_labels == y).sum().item()
+                test_total += y.size(0)
+            
+            test_loss /= len(test_data_loader)
+            test_acc = 100 * (test_correct / test_total)
+
+        if epoch % divisor == 0:
+            print(f"\nTrain loss: {train_loss:.5f} | Train acc: {train_acc:.2f}% | Test loss: {test_loss:.5f} | Test acc: {test_acc:.2f}%\n")
+
+        results["train_loss"].append(train_loss)
+        results["train_acc"].append(train_acc) 
+        results["test_loss"].append(test_loss)
+        results["test_acc"].append(test_acc)
+
+        if loss_curves:
+            plot_loss_curves(results)
+
 
 """
 A series of helper functions used throughout the course.
